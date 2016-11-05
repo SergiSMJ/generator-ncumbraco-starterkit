@@ -80,13 +80,13 @@ module.exports = yeoman.generators.Base.extend({
 
           // Views
           this.fs.copyTpl(
-            this.templatePath(projectFolder + '_Views/_Master.cshtml'),
+            this.templatePath(projectFolder + '_Views/_Master.cshtmlx'),
             this.destinationPath( projectFolderDestination + '/Views/Master.cshtml'), {
               name: this.props.name
             }
           );
           this.fs.copy(
-            this.templatePath(projectFolder + '_Views/*.cshtml'),
+            this.templatePath([projectFolder + '_Views/*.cshtml', ]),
             this.destinationPath(projectFolderDestination + 'Views'));
             //Partials
             this.fs.copy(
@@ -114,6 +114,26 @@ module.exports = yeoman.generators.Base.extend({
             this.fs.copy(
               this.templatePath(projectFolder + '_Views/MacroPartials/dummy.txt'),
               this.destinationPath(projectFolderDestination + 'Views/MacroPartials/dummy.txt'));
+            //Scripts
+            this.fs.copy(
+              this.templatePath(projectFolder + '_scripts/*.js'),
+              this.destinationPath(projectFolderDestination + 'scripts'));
+              //Script Master
+              this.fs.copyTpl(
+                this.templatePath(projectFolder + '_scripts/_master.jsx'),
+                this.destinationPath( projectFolderDestination + '/scripts/master.js'), {
+                  name: this.props.name
+                }
+              );
+            //typescript
+            this.fs.copy(
+              this.templatePath(projectFolder + '_scripts/typescript/*.txt'),
+              this.destinationPath(projectFolderDestination + 'scripts/typescript'));
+            //Novicell Components
+            this.fs.copy(
+              this.templatePath(projectFolder + '_scripts/components/*.js'),
+              this.destinationPath(projectFolderDestination + 'scripts/components'));
+
         }
       },
     },
