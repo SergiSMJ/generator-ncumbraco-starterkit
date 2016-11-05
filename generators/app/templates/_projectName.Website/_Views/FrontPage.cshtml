@@ -1,0 +1,11 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits UmbracoViewPage<FrontPage>
+@{
+    Layout = "Master.cshtml";
+}
+
+
+@*Do not use @Model.GridContent, it doesn't work*@
+
+@Html.GetGridHtml(Model.GetProperty("gridContent"), "NcGrid")

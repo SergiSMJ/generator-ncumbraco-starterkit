@@ -1,0 +1,18 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.HtmlModel>
+@{
+    <div class="nc-grid-html">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+    @Html.Raw(Model.HtmlSnippet)
+}
+
+@helper RenderBackend()
+{
+    @Html.Raw(Model.HtmlSnippet)
+}

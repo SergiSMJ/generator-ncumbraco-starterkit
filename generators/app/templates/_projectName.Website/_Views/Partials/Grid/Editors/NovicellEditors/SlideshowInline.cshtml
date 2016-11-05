@@ -1,0 +1,203 @@
+@using NovicellCorporate.Website.Models.GridComponent.PropertyModels
+@using LeBlender = Lecoati.LeBlender.Extension
+@using Newtonsoft.Json.Linq
+@using Newtonsoft.Json
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.SlideshowInlineModel>
+@if (Lecoati.LeBlender.Extension.Helper.IsFrontEnd())
+{
+    <div class="nc-grid-slideshowinline">
+        @foreach (var slide in Model.Slides)
+        {
+            if (slide.Image != null && slide.EmbeddedMedia == null)
+            {
+                //var imageCropUrl = slide.Image.GetCropUrl("HDImage"); <- Not working
+                var contentNodeUrl = slide.ContentNode.Url.Any() ? slide.ContentNode.Url : "";
+
+                <div class="nc-grid-slideshow-image item">
+                    <a href="@contentNodeUrl">
+                        <figure vocab="http://schema.org/" typeof="ImageObject"
+                                data-src="@slide.Image.Url"
+                                data-height-ratio="0.58"
+                                data-focalpoint="@slide.Image.GetFocalPoints()"
+                                data-mode="crop"
+                                data-quality="75"
+                                data-original-width="250"
+                                data-alt="@slide.Image.AlternativeText"
+                                data-title="@slide.Image.Title">
+                            <noscript class="responsiveLazyload">
+                                <img src="@slide.Image.Url" class="img-responsive" alt="@slide.Image.AlternativeText" title="@slide.Image.Title" property="contentUrl" />
+                            </noscript>
+                            @renderFigcaption(slide)
+                        </figure>
+                    </a>
+                </div>
+
+            }
+            else if (slide.EmbeddedMedia != null)
+            {
+                string img = string.Empty;
+                if (slide.Image != null)
+                {
+                    img = slide.Image.GetCropUrl("HDImage");
+                }
+                <div class="nc-grid-slideshow-oembed item">
+                    <figure vocab="http://schema.org/" typeof="">
+                        <div class="embed-container" property="">
+                            <div class="embed-player"
+                                 @* TODO : What is that ? there is no EmbedUrlWithSettings prop
+                                    data-oembed="@slide.EmbeddedMedia.EmbedUrlWithSettings"*@
+                                 @Html.Raw(!img.IsEmpty() ? "data-thumbnail=\"" + Html.Encode(img) + "\"" : string.Empty)>
+                            </div>
+                        </div>
+                        @renderFigcaption(slide)
+                    </figure>
+                </div>
+            }
+            else if (slide.ContentNode != null)
+            {
+                var contentNodeUrl = slide.ContentNode.Url.Any() ? slide.ContentNode.Url : "";
+                <div class="nc-grid-slideshow-image item">
+                    <a href="@contentNodeUrl">
+                        <figure vocab="http://schema.org/" typeof="ImageObject"
+                                data-src="@slide.Image.Url"
+                                data-height-ratio="0.58"
+                                data-focalpoint="@slide.Image.GetFocalPoints()"
+                                data-mode="crop"
+                                data-quality="75"
+                                data-original-width="250"
+                                data-alt="@slide.Image.AlternativeText"
+                                data-title="@slide.Image.Title">
+                            <noscript class="responsiveLazyload">
+                                <img src="@slide.Image.Url" class="img-responsive" alt="@slide.Image.AlternativeText" title="@slide.Image.Title" property="contentUrl" />
+                            </noscript>
+                            @renderThumbnailFigcaption(slide.ContentNode)
+                        </figure>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <style>
+        #Slide {
+            margin-bottom: 10px;
+        }
+
+        #Slide-Image img {
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #Slide-Description {
+            padding: 5px 0 5px 10px;
+        }
+
+            #Slide-Description #Slide-Title h3 {
+                line-height: 20px;
+                margin: 0 0 5px 0;
+            }
+    </style>
+    foreach (var slide in Model.Slides)
+    {
+        <div id="Slide" class="row-fluid">
+            <div id="Slide-Image" class="span3">
+                @*<img src="@slide.Image.Url?width=80&height=80&center=@slide.Image.Focalpoint.Top,@slide.Image.Focalpoint.Left&mode=crop" class="img-polaroid">*@
+                <img src="http://placehold.it/80x80" class="img-polaroid">
+            </div>
+            <div id="Slide-Description" class="span9 v-center">
+                <div id="Slide-Title" class="row-fluid">
+                    <h3>
+                        @(slide.Title.Substring(0, Math.Min(slide.Title.Length, 25)).Trim() + (slide.Title.Length > 25 ? "..." : ""))
+                        @*@if (slide.HasProperty("title") && slide.HasValue("title"))
+                            {
+                                @slide.GetPropertyValue("title")
+                            }
+                            else if (slide.HasProperty("thumbnailTitle") && slide.HasValue("thumbnailTitle"))
+                            {
+                                @slide.GetPropertyValue("thumbnailTitle")
+                            }*@
+                    </h3>
+                </div>
+                <div class="row-fluid">
+                    <p>
+                        Description
+                        @*@if (slide.HasProperty("description") && slide.HasValue("description"))
+                            {
+                                @slide.GetPropertyValue("description")
+                            }
+                            else if (slide.HasProperty("thumbnailDescription") && slide.HasValue("thumbnailDescription"))
+                            {
+                                @slide.GetPropertyValue("thumbnailDescription")
+                            }*@
+                    </p>
+                    <p>
+                        <b>Type:</b>
+                        @*@(slide.HasProperty("embed") && slide.HasValue("embed") ? "Embedded media" : "")
+                            @(slide.HasProperty("image") && slide.HasValue("image") && !slide.HasValue("embed") ? "Image" : "")
+                            @(slide.HasProperty("thumbnailImage") && slide.HasValue("thumbnailImage") ? "Content" : "")*@
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@helper renderFigcaption(InlineSlideModel slide)
+{
+string description = "";
+
+if (slide.Image != null && slide.EmbeddedMedia == null)
+{
+    description = slide.Image.Description ?? "";
+}
+else if (slide.EmbeddedMedia != null)
+{
+    description = slide.EmbeddedMedia.Description ?? "";
+}
+
+    <figcaption property="description">
+        @*<picture class="nc-grid-slideshow-image__author">
+            <source srcset="~/dist/images/Arya-Stark.jpg" media="(min-width: 80px)">
+            <div class="picture__background-image" style="background: url(/dist/images/Arya-Stark.jpg)"></div>
+        </picture>*@
+        @(!slide.Title.IsEmpty() ? Html.Raw("<h1>" + slide.Title + "</h1>") : Html.Raw(string.Empty))
+        @(!description.IsEmpty() ? description : string.Empty)
+        @{
+            var date = slide.ContentNode.CreateDate.Date.ToString("dd MMMM yyy");
+        }
+        @if (slide.Link != null)
+        {
+            <a href="@slide.Link.Url" @(!slide.Link.Target.IsEmpty() ? slide.Link.Target : "target=_blank")>@(!slide.LinkLabel.IsEmpty() ? slide.LinkLabel : "Read more...")</a>
+        }
+        @if (date != null && date.Any())
+        {
+            <time class="nc-grid-slideshowinline__publishedDate" datetime="@slide.ContentNode.CreateDate">
+                @date
+            </time>
+        }
+    </figcaption>
+}
+
+@helper renderThumbnailFigcaption(IPublishedContent slide)
+{
+string title = "", description = "";
+
+if (slide.HasValue("thumbnailTitle"))
+{
+    title = slide.GetPropertyValue("thumbnailTitle").ToString();
+}
+if (slide.HasValue("thumbnailDescription"))
+{
+    description = slide.GetPropertyValue("thumbnailDescription").ToString();
+}
+
+    <figcaption property="description">
+        @(!title.IsEmpty() ? Html.Raw("<h1>" + title + "</h1>") : Html.Raw(string.Empty))
+        @(!description.IsEmpty() ? description : string.Empty)
+        <a href="@slide.Url" target="_blank">Read more...</a>
+    </figcaption>
+}

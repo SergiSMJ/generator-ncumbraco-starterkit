@@ -1,0 +1,80 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+@using NovicellCorporate.Website.Models.GridComponent.PropertyModels
+
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.NewsListModel>
+@{
+    <div class="nc-grid-newslist">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+if (Model.News.Any())
+{
+        foreach (var article in Model.News)
+        {
+            var date = article.HasValue("displayDate") ? article.GetPropertyValue<DateTime>("displayDate").Date.ToString("dd MMMM yyy") : article.CreateDate.Date.ToString("dd MMMM yyy");
+            var focalpoints = article.HasValue("thumbnailImage") ? article.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").GetFocalPoints().ToString() : "0.5,0.5";
+            <div class="carousel-image item">
+                    <a href="@(article.Url)">
+                        <figure vocab="http://schema.org/" typeof="ImageObject"
+                                data-src="@(article.HasValue("thumbnailImage") ? article.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").Url : "")"
+                                data-height-ratio="0.58"
+                                data-focalpoint="@focalpoints"
+                                data-mode="crop"
+                                data-quality="75"
+                                data-original-width="250"
+                                data-alt="@(article.HasValue("thumbnailImage") ? article.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").AlternativeText : "carousel image")"
+                                data-title="@(article.HasValue("title") ? article.GetPropertyValue("title") : article.Name) image">
+                            <noscript class="responsiveLazyload">
+                                <img src="@(article.HasValue("thumbnailImage") ? article.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").Url : "")" class="img-responsive"
+                                     alt="@(article.HasValue("thumbnailImage") ? article.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").AlternativeText : "carousel image")"
+                                     title="@(article.HasValue("title") ? article.GetPropertyValue("title") : article.Name) image" property="contentUrl" />
+                            </noscript>
+                            <figcaption property="description">
+                                @if (article.HasValue("author"))
+                                {
+                                    <picture class="nc-grid-slideshow-image__author">
+                                        <source srcset="@(article.HasValue("author") ? article.GetPropertyValue<IEnumerable<IPublishedContent>>("author").FirstOrDefault().GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").Url : "")" media="(min-width: 80px)">
+                                        <div class="picture__background-image" style="background: url(@(article.HasValue("author") ? article.GetPropertyValue<IEnumerable<IPublishedContent>>("author").FirstOrDefault().GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").Url : ""))"></div>
+                                    </picture>
+                                }
+                                <h1>
+                                    @(article.HasValue("title") ? article.GetPropertyValue("title") : article.Name)
+                                </h1>
+                                <time class="nc-grid-slideshowinline__publishedDate" datetime="@(article.GetPropertyValue<DateTime>("displayDate").Date)">
+                                    @(date)
+                                </time>
+                            </figcaption>
+                        </figure>
+                    </a>
+</div>
+        }
+}
+else
+{
+        <p>No news found</p>
+}
+}
+
+@helper RenderBackend()
+{
+if (Model.News.Any())
+{
+        <ul>
+            @foreach (var article in Model.News)
+            {
+                <li>
+                    <p>title @(article.HasValue("title") ? article.GetPropertyValue("title") : article.Name)</p>
+                    <p>display date: @(article.GetPropertyValue<DateTime>("displayDate").Date)</p>
+                </li>
+            }
+        </ul>
+}
+else
+{
+        <p>No news found</p>
+}
+}

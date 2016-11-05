@@ -75,44 +75,45 @@ module.exports = yeoman.generators.Base.extend({
             this.destinationPath(projectFolderDestination + 'gulp/index.js'));
 
           this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_bower.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/bower.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_build.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/build.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_copy.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/copy.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_html.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/html.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_icons.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/icons.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_images.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/images.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_scripts.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/scripts.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_styles.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/styles.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_typescript.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/typescript.js'));
-          this.fs.copy(
-            this.templatePath(projectFolder + '_gulp/_tasks/_watch.js'),
-            this.destinationPath(projectFolderDestination + 'gulp/tasks/watch.js'));
+            this.templatePath(projectFolder + '_gulp/_tasks/*.js'),
+            this.destinationPath(projectFolderDestination + 'gulp/tasks'));
 
           // Views
-          // this.fs.copyTpl(
-          //   this.templatePath(projectFolder + '_Views/_Master.cshtml'),
-          //   this.destinationPath( projectFolderDestination + '/Views/Master.cshtml'), {
-          //     name: this.props.name
-          //   }
-          // );
-
+          this.fs.copyTpl(
+            this.templatePath(projectFolder + '_Views/_Master.cshtml'),
+            this.destinationPath( projectFolderDestination + '/Views/Master.cshtml'), {
+              name: this.props.name
+            }
+          );
+          this.fs.copy(
+            this.templatePath(projectFolder + '_Views/*.cshtml'),
+            this.destinationPath(projectFolderDestination + 'Views'));
+            //Partials
+            this.fs.copy(
+              this.templatePath(projectFolder + '_Views/Partials/*.cshtml'),
+              this.destinationPath(projectFolderDestination + 'Views/Partials'));
+              //Helpers
+              this.fs.copy(
+                this.templatePath(projectFolder + '_Views/Partials/Helpers/*.cshtml'),
+                this.destinationPath(projectFolderDestination + 'Views/Partials/Helpers'));
+              //Grid
+              this.fs.copy(
+                this.templatePath(projectFolder + '_Views/Partials/Grid/*.cshtml'),
+                this.destinationPath(projectFolderDestination + 'Views/Partials/Grid'));
+              this.fs.copy(
+                this.templatePath(projectFolder + '_Views/Partials/Grid/Editors/*.cshtml'),
+                this.destinationPath(projectFolderDestination + 'Views/Partials/Grid/Editors'));
+              this.fs.copy(
+                this.templatePath(projectFolder + '_Views/Partials/Grid/Editors/NovicellEditors/*.cshtml'),
+                this.destinationPath(projectFolderDestination + 'Views/Partials/Grid/Editors/NovicellEditors'));
+              //SEO
+              this.fs.copy(
+                this.templatePath(projectFolder + '_Views/Partials/SEO/*.cshtml'),
+                this.destinationPath(projectFolderDestination + 'Views/Partials/SEO'));
+            //Macro Partials
+            this.fs.copy(
+              this.templatePath(projectFolder + '_Views/MacroPartials/dummy.txt'),
+              this.destinationPath(projectFolderDestination + 'Views/MacroPartials/dummy.txt'));
         }
       },
     },

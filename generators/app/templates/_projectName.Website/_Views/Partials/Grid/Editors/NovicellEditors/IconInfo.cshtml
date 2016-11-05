@@ -1,0 +1,38 @@
+﻿@inherits UmbracoViewPage<Lecoati.LeBlender.Extension.Models.LeBlenderModel>
+
+
+@if (Model.Items != null && Model.Items.Any())
+{
+    <article class="info-icon-block">
+        @foreach (var iconInfo in Model.Items)
+        {
+            var icon = iconInfo.HasProperty("icon") ? iconInfo.GetValue("icon") : "";
+            var primaryColor = iconInfo.HasProperty("iconPrimaryColor") ? "#" + iconInfo.GetValue("iconPrimaryColor") : "";
+            var secondaryColor = iconInfo.HasProperty("iconSecondaryColor") ? "#" + iconInfo.GetValue("iconSecondaryColor") : "";
+            var informationText = iconInfo.HasProperty("informationText") ? iconInfo.GetValue("informationText") : "";
+            <header>
+                @if (secondaryColor.Any() && secondaryColor != "#")
+                {
+                    <svg class="icon-lg @icon" style="fill: url(#@icon)">
+                        <defs>
+                            <linearGradient id="@icon" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="@primaryColor" />
+                                <stop offset="100%" stop-color="@secondaryColor" />
+                            </linearGradient>
+                        </defs>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#@icon"></use>
+                    </svg>
+                }
+                else
+                {
+                    <svg class="icon-lg @icon" style="fill: @primaryColor">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#@icon"></use>
+                    </svg>
+                }
+            </header>
+            <div class="description__number">
+                @Html.Raw(informationText)
+            </div>
+        }
+    </article>
+}

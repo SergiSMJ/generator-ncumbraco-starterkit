@@ -1,0 +1,98 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+@using NovicellCorporate.Website.Models.GridComponent.PropertyModels
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.ThumbnailListModel>
+@{
+    <div class="">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+if (Model.ThumbnailList.Any())
+{
+    var i = 1;
+    var caseClass = "";
+        <section id="cases">
+            @foreach (var item in Model.ThumbnailList.Take(8))
+            {
+                var image = item.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").Url;
+                var title = item.HasProperty("title") && item.GetPropertyValue("title") != "" ? item.GetPropertyValue("title") : item.Name;
+                switch (i)
+                {
+                    case 1:
+                    case 4:
+                    case 8:
+                        caseClass = "sm-caption-case";
+                        break;
+                    case 2:
+                    case 7:
+                        caseClass = "md-caption-case";
+                        break;
+                    case 3:
+                    case 5:
+                    case 6:
+                        caseClass = "lg-caption-case";
+                        break;
+                }
+                <div class="case col--md-3 col--sm-6 col--xs-6 @caseClass @i">
+                    <figure vocab="http://schema.org/" typeof="ImageObject"
+                            data-src="@image"
+                            data-height-ratio="@(item.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").GetOriginalHeightRatio())"
+                            data-focalpoint="@(item.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").GetFocalPoints())"
+                            data-mode="crop"
+                            data-quality="75"
+                            data-original-width="@(item.GetPropertyValue<FocalpointImageItemModel>("thumbnailImage").GetWidth())"
+                            data-alt="case image"
+                            data-title="case"
+                            data-parent=".case"
+                            data-is-background="true">
+                        <noscript class="responsiveLazyload">
+                            <img src="@image" class="img-responsive" alt="case image" title="case" property="contentUrl" />
+                        </noscript>
+                        <figcaption property="description">
+                            <h1>@title</h1>
+                            <div class="case__description">
+                                @Html.Raw(Umbraco.Truncate(item.GetPropertyValue("description").ToString(), 50))
+                            </div>
+                        </figcaption>
+                        <span class="figure__bg"></span>
+                        <svg class="icon icon-diagonal-arrow">
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-diagonal-arrow"></use>
+                        </svg>
+                    </figure>
+                </div>
+                i++;
+            }
+        </section>
+}
+else
+{
+
+        <p>No cases found</p>
+}
+}
+
+@helper RenderBackend()
+{
+if (Model.ThumbnailList.Any())
+{
+
+        <ul>
+            @foreach (var item in Model.ThumbnailList)
+            {
+                <li>
+                    <a href="@item.Url">
+                        @(item.GetPropertyValue("title") ?? item.Name) | @item.CreateDate.Date | @item.UpdateDate.Date | @(item.GetPropertyValue<DateTime>("displayDate").Date)
+                    </a>
+                </li>
+            }
+        </ul>
+}
+else
+{
+
+        <p>No pages found</p>
+}
+}

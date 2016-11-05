@@ -1,0 +1,18 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@model NovicellCorporate.Website.Models.Default.CookieModel
+@if (!string.IsNullOrWhiteSpace(Model.Content))
+{
+    <button class="cookie-info__open" id="cookie-info-open">
+        @Model.OpenButtonContent
+    </button>
+
+    <section class="cookie-info" id="cookie-info">
+        <div class="cookie-info__text">
+            @Html.Raw(Model.Content)
+            <button class="cookie-info__close" id="cookie-info-close">
+                @Model.CloseButtonContent
+            </button>
+        </div>
+    </section>
+}

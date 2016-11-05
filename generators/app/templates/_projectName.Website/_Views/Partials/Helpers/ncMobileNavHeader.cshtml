@@ -1,0 +1,49 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits UmbracoTemplatePage
+@{
+    var current = Model.Content;
+    var siteNode = current.GetSiteNode();
+}
+
+<nav class="nav-main" role="navigation" vocab="http://schema.org/" typeof="SiteNavigationElement">
+    <ul id="navigation-list">
+        @RenderSubNavigation(siteNode, current, false)
+    </ul>
+</nav>
+
+@helper RenderSubNavigation(IPublishedContent child, IPublishedContent current, bool isSub)
+{
+    if (isSub)
+    {
+        @:<ul class="sub-nav">
+    }
+    foreach (var node in child.Children.Where(x => x.IsVisible() && !x.GetPropertyValue<bool>("umbracoNaviHide")))
+    {
+        var hasChildren = node.Children.Any() && node.Children.Any(x => x.IsVisible() && !x.GetPropertyValue<bool>("umbracoNaviHide"));
+        <li>
+            <a href="@node.Url" class="@(node.Id == current.Id ? "active" : "")" property="url">
+                <span property="name">@node.Name</span>
+                @if (hasChildren)
+                {
+                    @RenderSubnavTrigger()
+                }
+            </a>
+            @if (hasChildren)
+            {
+                @RenderSubNavigation(node, current, true)
+            }
+        </li>
+    }
+    if (isSub)
+    {
+        @:</ul>
+    }
+}
+@helper RenderSubnavTrigger()
+{
+    <button class="subnav-trigger">
+        <svg class="arrow-down"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#arrow"></use></svg>
+    </button>
+}

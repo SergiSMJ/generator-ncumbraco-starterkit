@@ -1,0 +1,34 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.EmployeeModel>
+@{
+    <div class="nc-grid-employee">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+    foreach (var employee in Model.Employees)
+    {
+        <figure vocab="http://schema.org/" typeof="">
+            <img src="@employee.GetCropUrl(propertyAlias: "thumbnailImage", height:300, width:400)" alt="This is a image of @employee.Name" title="@employee.Name" />
+            <figcaption>
+                @employee.Name
+            </figcaption>
+        </figure>
+    }
+}
+
+@helper RenderBackend()
+{
+    foreach (var employee in Model.Employees)
+    {
+        <figure>
+            <img src="@employee.GetCropUrl(propertyAlias: "thumbnailImage", height: 150, width: 150)" alt="This is a image of @employee.Name" title="@employee.Name" />
+            <figcaption>
+                @employee.Name
+            </figcaption>
+        </figure>
+    }
+}

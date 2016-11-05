@@ -1,0 +1,162 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@using SEOChecker.MVC
+@using Umbraco.Core.Models
+@Html.ViewName()
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+
+    //Site Node
+    var siteNode = Model.Content.GetSiteNode();
+
+    //Default Values from site node
+    string siteName = Model.Content.GetPropertyValue<string>("siteName", true);
+    bool seoNoODP = siteNode.GetPropertyValue<bool>("seoNoODP");
+    bool seoNoYDIR = siteNode.GetPropertyValue<bool>("seoNoYDIR");
+    string seoWebMasterToolAccount = siteNode.GetPropertyValue<string>("seoWebmasterToolAccount");
+
+    //Urls
+    string protocol = Request.ServerVariables["SERVER_PORT_SECURE"];
+    if (protocol == null || protocol == "0")
+    {
+        protocol = "http://";
+    }
+    else
+    {
+        protocol = "https://";
+    }
+
+    string absoluteUrl = Request.Url.AbsoluteUri;
+    string absoluteHost = protocol + Request.Url.Host.ToString();
+
+    //Default Values from current page
+    string robots = "";
+    string pageTitle = "";
+    string pageDescription = "";
+    string imageUrl = "";
+    string seoCanonical = "";
+
+    //Check if Seo Checker Exsists
+    bool useSeoChecker = true;
+
+    MetaData metaData = Model.Content.GetPropertyValue<MetaData>("seoChecker");
+
+    if (metaData == null)
+    {
+        useSeoChecker = false;
+    }
+
+    if (useSeoChecker)
+    {
+        pageTitle = metaData.Title;
+        pageDescription = metaData.Description;
+        seoCanonical = metaData.CanonicalUrl;
+        robots = metaData.Robots;
+    }
+    
+    // SEO overrides
+    string seoCanonicalOverride = Model.Content.GetPropertyValue<string>("seoCanonical");
+    if (!string.IsNullOrWhiteSpace(seoCanonicalOverride))
+    {
+        seoCanonical = seoCanonicalOverride;
+    }
+
+
+    //Check all values
+    if (string.IsNullOrWhiteSpace(pageTitle))
+    {
+        pageTitle = Html.Raw(Model.Content.Name) + " - " + Html.Raw(siteName);
+    }
+
+    //if (string.IsNullOrWhiteSpace(pageDescription))
+    //{
+    //    TODO: Make sensible fallback, if no clue contact OMF.
+    //    pageDescription = current.GetPropertyValue<string>("SomeFallBackDescription");
+    //}
+
+    //Image Url
+    if (string.IsNullOrEmpty(Model.Content.GetPropertyValue<string>("pageImage")))
+    {
+        imageUrl = absoluteHost + "/images/logo.png";
+    }
+    else
+    {
+        IPublishedContent image = Model.Content.GetPropertyValue<IPublishedContent>("pageImage");
+        if (image != null)
+        {
+            imageUrl = absoluteHost + image.GetCropUrl(width: 1200, height: 630) + "&format=jpg";
+        }
+    }
+
+    //Robots
+    if (!seoNoODP)
+    {
+        if (!string.IsNullOrEmpty(robots))
+        {
+            robots += ", NOODP";
+        }
+        else
+        {
+            robots = "NOODP";
+        }
+    }
+    if (!seoNoYDIR)
+    {
+        if (!string.IsNullOrEmpty(robots))
+        {
+            robots += ", NOYDIR";
+        }
+        else
+        {
+            robots = "NOYDIR";
+        }
+    }
+
+    var urlRequest = Request.Url;
+
+    // do not index the site if the host is ditnyewebsite.dk or novicell.dk
+    if ((urlRequest != null && urlRequest.Host.Contains("ditnyewebsite.dk")) || (urlRequest != null && urlRequest.Host.Contains("novicell.dk")))
+    {
+        robots = "NOINDEX, NOFOLLOW, NOODP, NOYDIR";
+    }
+
+    if (!string.IsNullOrWhiteSpace(seoWebMasterToolAccount))
+    {
+    <meta name="google-site-verification" content="@seoWebMasterToolAccount" />
+    }
+
+    if (!string.IsNullOrEmpty(robots))
+    {
+    <meta name="robots" content="@robots" />
+    }
+
+    <title>@pageTitle</title>
+    <meta name="description" content="@pageDescription" />
+    <meta property="og:title" content="@pageTitle" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@absoluteUrl" />
+    <meta property="og:image" content="@imageUrl" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    if (!string.IsNullOrWhiteSpace(seoCanonical))
+    {
+        // Remove any reference to "/home/"
+        seoCanonical = seoCanonical.Replace("/home/", "/");
+
+        if (!seoCanonical.StartsWith("http"))
+        {
+            if (!seoCanonical.StartsWith("/"))
+            {
+                seoCanonical = "/" + seoCanonical;
+            }
+            seoCanonical = absoluteHost + seoCanonical;
+        }
+        if (seoCanonical.EndsWith("/"))
+        {
+            seoCanonical = seoCanonical.Substring(0, (seoCanonical.Length - 1));
+        }
+
+    <link ref="canonical" href="@seoCanonical" />
+    }
+
+}

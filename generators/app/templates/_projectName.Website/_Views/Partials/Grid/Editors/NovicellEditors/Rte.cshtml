@@ -1,0 +1,5 @@
+@model dynamic
+@using Umbraco.Web.Templates
+<div class="nc-grid-richtexteditor" nc-search-key="grid-rte">
+    @Html.Raw(TemplateUtilities.ParseInternalLinks(Model.value.ToString()))
+</div>

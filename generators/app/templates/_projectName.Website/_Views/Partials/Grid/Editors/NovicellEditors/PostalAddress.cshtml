@@ -1,0 +1,52 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.PostalAddressModel>
+@{
+    @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+}
+
+@helper RenderFrontend() {
+    @*
+        The Example below shows how to implement the schema.org type LocalBusiness as Json+ld
+        and the implemented code uses RDFa markup.
+    <script type="application/ld+json">
+    {
+        "@@context": "http://schema.org",
+        "@@type": "LocalBusiness",
+        "name": "@Model.Name",
+        "description": "@Model.Description",
+        "address": {
+            "@@type": "PostalAddress",
+            "streetAddress": "@Model.StreetAddress",
+            "addressLocality": "@Model.AddressLocality",
+            "addressRegion": "@Model.AddressRegion",
+            "postalCode": "@Model.PostalCode",
+            "addressCountry": "@Model.AddressCountry"
+        },
+        "telephone": "@Model.Telephone",
+        "email": "@Model.Email"
+    }
+    </script>
+    *@
+    <div class="nc-grid-postaladdress" vocab="http://schema.org/" typeof="LocalBusiness">
+        <h3 property="name">@Model.Name</h3>
+        <address property="address" typeof="PostalAddress">
+            <span property="streetAddress">@Model.StreetAddress</span><br />
+            <span property="postalCode">@Model.PostalCode</span> <span property="addressLocality">@Model.AddressLocality, </span>
+            <span property="addressRegion">@Model.AddressRegion </span>
+            <span property="addressCountry">@Model.AddressCountry</span>
+        </address>
+    </div>
+}
+
+@helper RenderBackend() {
+    <div class="nc-grid-postaladdress">
+        <h3>@Model.Name</h3>
+        <address>
+            <span>@Model.StreetAddress</span><br />
+            <span>@Model.PostalCode</span> <span>@Model.AddressLocality</span><br />
+            <span>@Model.AddressRegion</span><br />
+            <span>@Model.AddressCountry</span><br />
+        </address>
+    </div>
+}

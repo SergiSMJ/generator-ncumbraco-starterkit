@@ -1,0 +1,46 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    var siteNode = Model.Content.GetSiteNode();
+    var level2Node = Model.Content.AncestorOrSelf(2);
+}
+
+<nav id="sidebar-wrapper" class="nav-main" role="navigation" vocab="http://schema.org/" typeof="SiteNavigationElement">
+    <ul class="sidebar-nav">
+        @{
+            <li class="sidebar-brand">
+                @*<a href="#" onclick=$("#menu-close").click();></a>*@
+                <a id="menu-close" href="#" class="toggle">
+                    <svg class="icon icon-cancel">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-cancel"></use>
+                    </svg>
+                </a>
+            </li>
+            // Get umbraco pages where 'show in top navigation' is true
+            foreach (var page in siteNode.Children.Where(n => n.IsVisible()))
+            {
+                // If looped item is equal to current node, set class to active
+                string childClass = page.Id == level2Node.Id ? " class=\"sidebar-nav__li active\"" : " class=\"sidebar-nav__li\"";
+                <li @(Html.Raw(childClass))>
+                    <a href="@page.Url" property="url" class="sidebar-nav__link">
+                        <span property="name">@page.Name</span>
+                    </a>
+                    @if (page.Children.Any() && !page.GetPropertyValue<bool>("hideChildrenInNavigation") )
+                    {
+                        <ul>
+                            @foreach (var subPage in page.Children.Where(n => n.IsVisible()))
+                            {
+                                <li>
+                                    <a href="@subPage.Url" property="url" class="sidebar-nav__link">
+                                        <span property="name">@subPage.Name</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </li>
+            }
+        }
+    </ul>
+</nav>

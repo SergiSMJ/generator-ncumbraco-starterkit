@@ -1,0 +1,79 @@
+﻿@using NovicellCorporate.Website
+@using Umbraco.Web
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    Layout = null;
+    var siteNode = Model.Content.GetSiteNode();
+}
+<!doctype html>
+<html lang="@Html.GetTwoLetterIsoLanguageName()">
+<head>
+    <meta charset="utf-8">
+    @Html.Partial("SEO/ncSiteSeo")
+
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title><%=name%></title>
+    @Html.Raw(siteNode.GetPropertyValue<string>("scriptPageHeader"))
+    @Html.Raw(Model.Content.GetPropertyValue<string>("scriptPageHeader"))
+
+    <link rel="stylesheet" href="@Url.VersionedContent("~/dist/css/master.min.css")">
+
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body id="site" vocab="http://schema.org" typeof="WebPage">
+    @Html.Partial("SEO/ncSiteGoogleAnalytics")
+    @Html.Partial("SEO/ncGoogleRemarketing")
+    @Html.Raw(siteNode.GetPropertyValue<string>("scriptPageBodyTop"))
+    @Html.Raw(Model.Content.GetPropertyValue<string>("scriptPageBodyTop"))
+
+    <!--[if lt IE 9]>
+        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <main id="page">
+
+        <header id="header">
+            <section class="top-bar">
+                <div class="logo">
+                    <figure>
+                        <a href="/">
+                            <img src="~/dist/images/logo.png" class="logo__img" alt="Logo">
+                        </a>
+                    </figure>
+                </div>
+            </section>
+            @Html.Partial("Helpers/ncNavHeader")
+        </header>
+
+        <div id="content" role="main">
+            @RenderBody()
+        </div>
+        <footer id="footer">
+            <div class="container">
+                <div class="contact-info">
+                    <div class="">
+                        @Html.GetGridHtml(siteNode.GetProperty("footer"), "NcGrid")
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    @Html.Action("RenderCookie", "Cookie", new { siteNode = Model.Content.GetSiteNode() })
+
+        @Html.Raw(siteNode.GetPropertyValue<string>("scriptPageBodyBottom"))
+        @Html.Raw(Model.Content.GetPropertyValue<string>("scriptPageBodyBottom"))
+
+        <script src="@Url.VersionedContent("~/dist/scripts/vendor.min.js")"></script>
+        <script src="@Url.VersionedContent("~/dist/scripts/master.min.js")"></script>
+
+    </body>
+
+</html>

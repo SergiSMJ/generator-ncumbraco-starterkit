@@ -1,0 +1,26 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits  UmbracoViewPage<NovicellCorporate.Website.Models.SearchResultViewModel>
+@{
+    Layout = "Master.cshtml";
+    var searchTerm = Request.QueryString["search"];
+}
+
+<h1>Din søgning</h1>
+<h2>Din søgning på "@searchTerm" gav følgende resultater (@Model.Results.Count())</h2>
+
+@if (Model.Results.Any())
+{
+    <ul>
+        @foreach (var item in Model.Results)
+        {
+            <li>
+                <a href="@item.Url">
+                    @item.Name
+                </a>
+            </li>
+        }
+    </ul>
+
+}
+

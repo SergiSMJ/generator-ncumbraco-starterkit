@@ -1,0 +1,16 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits  UmbracoViewPage<TextPage>
+@{
+    Layout = "Master.cshtml";
+}
+
+<section id="textpage">
+    @*@Html.Partial("Helpers/ncNavSub")*@
+    <section>
+            @*<h1>@Model.Name</h1>*@
+
+            @*Do not use @Model.GridContent, it doesn't work*@
+            @Html.GetGridHtml(Model.GetProperty("gridContent"), "NcGrid")
+    </section>
+</section>

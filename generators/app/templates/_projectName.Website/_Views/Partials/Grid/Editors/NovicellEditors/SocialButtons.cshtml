@@ -1,0 +1,57 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.SocialButtonsModel>
+@{
+    @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+}
+
+@helper RenderFrontend() {
+    <div class="nc-grid-socialbuttons" vocab="http://schema.org/" typeof="Organization">
+        <h2>#novicell</h2>
+        @if (!Model.FacebookUrl.IsNullOrWhiteSpace()) {
+            <a property="sameAs" href="@Model.FacebookUrl" target="_blank">
+                <svg class="icon icon-facebook">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-facebook"></use>
+                </svg>
+            </a>
+        }
+        @if (!Model.LinkedInUrl.IsNullOrWhiteSpace()) {
+            <a property="sameAs" href="@Model.LinkedInUrl" target="_blank">
+                <svg class="icon icon-linkedin">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-linkedin"></use>
+                </svg>
+            </a>
+        }
+        @if (!Model.TwitterUrl.IsNullOrWhiteSpace()) {
+            <a property="sameAs" href="@Model.TwitterUrl" target="_blank">
+                <svg class="icon icon-twitter">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-twitter"></use>
+                </svg>
+            </a>
+        }
+        @if (!Model.InstagramUrl.IsNullOrWhiteSpace()) {
+            <a property="sameAs" href="@Model.InstagramUrl" target="_blank">
+                <svg class="icon icon-instagram">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="/dist/icons/icons.svg#icon-instagram"></use>
+                </svg>
+            </a>
+        }
+    </div>
+}
+
+@helper RenderBackend() {
+    <div class="nc-grid-socialbuttons">
+        @if (!Model.FacebookUrl.IsNullOrWhiteSpace()) {
+            <p>Facebook</p>
+        }
+        @if (!Model.LinkedInUrl.IsNullOrWhiteSpace()) {
+            <p>LinkedIn</p>
+        }
+        @if (!Model.TwitterUrl.IsNullOrWhiteSpace()) {
+            <p>Twitter</p>
+        }
+        @if (!Model.InstagramUrl.IsNullOrWhiteSpace()) {
+            <p>Instagram</p>
+        }
+    </div>
+}

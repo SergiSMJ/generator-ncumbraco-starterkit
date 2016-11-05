@@ -1,0 +1,207 @@
+@using Newtonsoft.Json.Linq
+@using Newtonsoft.Json
+
+@using Umbraco.Web
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.SlideshowModel>
+
+@if (Lecoati.LeBlender.Extension.Helper.IsFrontEnd())
+{
+    int width = 1920, height = 800;
+    <div class="nc-grid-slideshow">
+        @foreach (var slide in Model.Slides)
+        {
+            if (slide.HasProperty("image") && slide.HasValue("image") && !(slide.HasProperty("embed") && slide.HasValue("embed")))
+            {
+                <div class="nc-grid-slideshow-image">
+                    <figure vocab="http://schema.org/" typeof="ImageObject">
+                        <noscript>
+                            <img src="@slide.GetCropUrl(propertyAlias: "image", height:height, width:width)" class="img-responsive"
+                                 alt=""
+                                 title=""
+                                 property="contentUrl" />
+                        </noscript>
+                        @renderFigcaption(slide)
+                    </figure>
+                </div>
+            }
+            else if (slide.HasProperty("embed") && slide.HasValue("embed"))
+            {
+                JObject embedJson = JObject.Parse(slide.GetPropertyValue("embed").ToString());
+                string img = string.Empty;
+                if (slide.HasProperty("image") && slide.HasValue("image"))
+                {
+                    img = slide.GetCropUrl(propertyAlias: "image", height: height, width: width);
+                }
+                <div class="nc-grid-slideshow-oembed">
+                    <figure vocab="http://schema.org/" typeof="">
+                        <div class="embed-container" property="">
+                            <div class="embed-player" 
+                                data-oembed="@embedJson["embedUrlWithSettings"].ToString()"
+                                @Html.Raw(!img.IsEmpty() ? "data-thumbnail=\"" + Html.Encode(img) + "\"" : string.Empty)>
+                            </div>
+                        </div>
+                        @renderFigcaption(slide)
+                    </figure>
+                </div>
+            }
+            else if (slide.DocumentTypeAlias != "slide")
+	        {
+                <div class="nc-grid-slideshow-umbnode">
+                    <figure vocab="http://schema.org/" typeof="">
+                        <noscript>
+                            <img src="@slide.GetCropUrl(propertyAlias: "thumbnailImage", height:height, width:width)"
+                                class="img-responsive"
+                                alt="@slide.GetPropertyValue("thumbnailTitle").ToString()"
+                                title="@slide.GetPropertyValue("thumbnailTitle").ToString()"
+                                property="" />
+                        </noscript>
+                        @renderThumbnailFigcaption(slide)
+                    </figure>
+                </div>
+	        }
+        }
+    </div>
+}
+else
+{
+    <style>
+        .nc-slide {
+            margin-bottom: 10px;
+        }
+        .nc-slide-embed {
+            float: left;
+            width: 110px;
+            height: 110px;
+        }
+        .nc-slide-description {
+            width: 200px;
+            float: left;
+            padding: 5px 0 5px 10px;
+        }
+        .nc-slide-title h3 {
+            line-height: 20px;
+            margin: 0 0 5px 0;
+        }
+    </style>
+    foreach (var slide in Model.Slides)
+    {
+        <div class="nc-slide row-fluid">
+            <div class="nc-slide-embed">
+                @if (slide.HasProperty("image") && slide.HasValue("image") && !slide.HasValue("embed"))
+                {
+                    <img src="@slide.GetCropUrl(propertyAlias: "image", height:100, width:100)" class="img-polaroid" />
+                }
+                else if (slide.HasProperty("thumbnailImage") && slide.HasValue("thumbnailImage"))
+	            {
+		            <img src="@slide.GetCropUrl(propertyAlias: "thumbnailImage", height:100, width:100)" class="img-polaroid" />
+	            }
+                else if (slide.HasProperty("embed") && slide.HasValue("embed"))
+                {
+                    JObject embed = JObject.Parse(slide.GetPropertyValue("embed").ToString());
+                    
+                    <iframe 
+                        class="img-polaroid"
+                        id="player" 
+                        type="text/html" 
+                        src="@embed["embedUrlWithoutSettings"]"
+                        frameborder="0"
+                        width="100"
+                        height="100"></iframe>
+                }
+                else
+                {
+                    <img src="http://placehold.it/80?text=" class="img-polaroid">
+                }
+            </div>
+            <div class="nc-slide-description v-center">
+                <div class="nc-slide-title row-fluid">
+                    <h3>
+                        @if (slide.HasProperty("thumbnailTitle") && slide.HasValue("thumbnailTitle"))
+                        {
+                            @slide.GetPropertyValue("thumbnailTitle")
+                        }
+                        else if (slide.HasProperty("title") && slide.HasValue("title"))
+                        {
+                            @slide.GetPropertyValue("title")
+                        }
+                        else
+                        {
+                            @slide.Name
+                        }
+                    </h3>
+                </div>
+                <div class="row-fluid">
+                    <p>
+                        @{
+                            var description = "";
+                            if (slide.HasProperty("thumbnailDescription") && slide.HasValue("thumbnailDescription"))
+                            {
+                                description = slide.GetPropertyValue("thumbnailDescription").ToString();
+                            }
+                            else if (slide.HasProperty("description") && slide.HasValue("description"))
+                            {
+                                description = slide.GetPropertyValue("description").ToString();
+                            }
+                            else
+                            {
+                                description = "Description is missing...";
+                            }
+                        }
+                        @Html.Raw(description.Substring(0, Math.Min(description.Length, 30)).Trim() + (description.Length > 30 ? "..." : string.Empty))
+                    </p>
+                    <p>
+                        <b>Type:</b>
+                        @(slide.HasProperty("embed") && slide.HasValue("embed") ? "Embedded media" : string.Empty)
+                        @(slide.HasProperty("image") && slide.HasValue("image") && !slide.HasValue("embed") ? "Image" : string.Empty)
+                        @(slide.HasProperty("thumbnailImage") && slide.HasValue("thumbnailImage") ? "Content" : string.Empty)
+                    </p>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@helper renderFigcaption(IPublishedContent slide) {
+    string title = "", description = "", linkLabel = "";
+    JObject linkJson = new JObject();
+    
+    if (slide.HasValue("title")) {
+        title = slide.GetPropertyValue("title").ToString();
+    }
+    if (slide.HasValue("description")) {
+        description = slide.GetPropertyValue("description").ToString();
+    }
+    if (slide.HasValue("linkLabel")) {
+        linkLabel = slide.GetPropertyValue("linkLabel").ToString();
+    }
+    if (slide.HasValue("link")) {
+        linkJson = JObject.Parse(slide.GetPropertyValue("link").ToString());
+    }
+    
+    <figcaption property="description">
+        @(!title.IsEmpty() ? Html.Raw("<h1>" + title + "</h1>") : Html.Raw(string.Empty))
+        @(!description.IsEmpty() ? description : string.Empty)
+        @if (linkJson.HasValues)
+        {
+            <a href="@linkJson["url"]" @(linkJson["target"].HasValues ? linkJson["target"] : "target=_blank")>@(!linkLabel.IsEmpty() ? linkLabel : "Read more...")</a>
+        }
+    </figcaption>
+}
+
+@helper renderThumbnailFigcaption(IPublishedContent slide) {
+    string title = "", description = "";
+    
+    if (slide.HasValue("thumbnailTitle")) {
+        title = slide.GetPropertyValue("thumbnailTitle").ToString();
+    }
+    if (slide.HasValue("thumbnailDescription")) {
+        description = slide.GetPropertyValue("thumbnailDescription").ToString();
+    }
+    
+    <figcaption property="description">
+        @(!title.IsEmpty() ? Html.Raw("<h1>" + title + "</h1>") : Html.Raw(string.Empty))
+        @(!description.IsEmpty() ? description : string.Empty)
+        <a href="@slide.Url" target="_blank">Read more...</a>
+    </figcaption>
+}

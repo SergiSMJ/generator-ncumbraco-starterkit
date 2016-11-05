@@ -1,0 +1,22 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.WidgetIconModel>
+@{
+    @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+}
+
+@helper RenderFrontend()
+{
+    <script type="application/ld+json">
+        {
+        "@@context": "http://schema.org",
+        "@@type": "?"
+        }
+    </script>
+    <h1>Widget Icon</h1>
+}
+
+@helper RenderBackend()
+{
+    <h1>Widget Icon</h1>
+}

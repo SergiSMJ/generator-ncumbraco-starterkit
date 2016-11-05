@@ -1,0 +1,72 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.EmbedMediaModel>
+@{
+    <div class="nc-grid-embedmedia">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+    @RenderEmbed()
+}
+
+@helper RenderBackend()
+{
+    @RenderEmbed()
+    <script>
+        novicell.embed.backofficeEmbeds();
+    </script>
+}
+
+@helper RenderEmbed()
+{
+    if (Model.PreviewImage != null)
+    {
+        <figure class="embed-preview-image" vocab="http://schema.org/" typeof="ImageObject"
+                data-src="@Model.PreviewImage.Url"
+                data-height-ratio="@Model.EmbeddedMedia.Ratio.ToString().Replace(",", ".")"
+                data-focalpoint="@Model.PreviewImage.FocalPoint.Top.ToString().Replace(",", "."),@Model.PreviewImage.FocalPoint.Left.ToString().Replace(",", ".")"
+                data-mode="crop"
+                data-quality="75">
+            <noscript class="responsiveLazyload">
+                <img src="@Model.PreviewImage.Url"
+                     alt="@Model.PreviewImage.AlternativeText"
+                     title="@Model.PreviewImage.Title"
+                     property="contentUrl" />
+            </noscript>
+            @RenderPreviewFigcaption()
+        </figure>
+    }
+
+    if (!Model.EmbeddedMedia.Markup.IsEmpty())
+    {
+        <figure class="embed-media-item">
+            @Html.Raw(Model.EmbeddedMedia.Markup)
+            @RenderFigcaption()
+        </figure>
+    }
+}
+
+@helper RenderFigcaption()
+{
+    if (Model.EmbeddedMedia.Description.IsEmpty())
+    {
+        return;
+    }
+    @Html.Raw("<figcaption>")
+    @Model.EmbeddedMedia.Description
+    @Html.Raw("</figcaption>")
+}
+
+@helper RenderPreviewFigcaption()
+{
+    if (Model.PreviewImage.Description.IsEmpty())
+    {
+        return;
+    }
+    @Html.Raw(LeBlender.Helper.IsFrontEnd() ? "<figcaption property=\"description\">" : "<figcaption>")
+    @Model.PreviewImage.Description
+    @Html.Raw("</figcaption>")
+}

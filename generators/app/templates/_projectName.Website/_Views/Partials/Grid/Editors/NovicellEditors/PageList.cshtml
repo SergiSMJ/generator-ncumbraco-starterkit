@@ -1,0 +1,28 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.PageListModel>
+@{
+    <div class="nc-grid-pagelist">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+    foreach (var page in Model.Pages)
+    {
+        <a href="@page.Url">
+            <p class="nc-grid-pagelist__page-name">@page.Name</p>
+        </a>
+    }
+}
+
+@helper RenderBackend()
+{
+    foreach (var page in Model.Pages)
+    {
+        <a href="@page.Url">
+            <p class="nc-grid-pagelist__page-name">@page.Name</p>
+        </a>
+    }
+}

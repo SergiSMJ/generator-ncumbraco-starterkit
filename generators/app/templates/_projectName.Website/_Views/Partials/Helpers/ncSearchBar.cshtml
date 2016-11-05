@@ -1,0 +1,11 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@Html.ViewName()
+@inherits UmbracoTemplatePage
+@{
+}
+<form name="search" method="GET" action="/search/">
+    <input id="search" type="search" name="search" placeholder="Hvad leder du efter?" />
+    <button id="search-button" type="submit" title="Search">
+        S�g
+    </button>
+</form>

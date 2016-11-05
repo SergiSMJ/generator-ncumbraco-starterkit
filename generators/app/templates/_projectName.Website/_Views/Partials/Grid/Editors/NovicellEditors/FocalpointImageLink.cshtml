@@ -1,0 +1,66 @@
+@using LeBlender = Lecoati.LeBlender.Extension
+
+@inherits UmbracoViewPage<NovicellCorporate.Website.Models.GridComponent.FocalpointImageLinkModel>
+@{
+    <div class="nc-grid-focalpointimagelink">
+        @(LeBlender.Helper.IsFrontEnd() ? @RenderFrontend() : @RenderBackend())
+    </div>
+}
+
+@helper RenderFrontend()
+{
+    if (!string.IsNullOrWhiteSpace(Model.LinkPicker.Url))
+    {
+        @:<a href="@Model.LinkPicker.Url" target="@Model.LinkPicker.Target">
+    }
+    <figure vocab="http://schema.org/" typeof="ImageObject"
+            data-src="@Model.Image.Url"
+            data-height-ratio="@Model.Image.GetOriginalHeightRatio()"
+            data-focalpoint="@Model.Image.GetFocalPoints()"
+            data-mode="crop"
+            data-quality="75"
+            data-original-width="@Model.Image.GetWidth()"
+            data-alt="@Model.Image.AlternativeText"
+            data-title="@Model.Image.Title"
+            data-filter="greyscale">
+        <noscript class="responsiveLazyload">
+            <img src="@Model.Image.Url"
+                 alt="@Model.Image.AlternativeText"
+                 title="@Model.Image.Title"
+                 property="contentUrl" />
+        </noscript>
+        @RenderFigcaption()
+    </figure>
+    if (!string.IsNullOrWhiteSpace(Model.LinkPicker.Url))
+    {
+        @:</a>
+    }
+}
+
+@helper RenderBackend()
+{
+    if (!string.IsNullOrWhiteSpace(Model.Image.Url))
+    {
+        <figure>
+            <img src="@Model.Image.GetCropUrl("Thumbnail")" alt="@Model.Image.AlternativeText" />
+            @RenderFigcaption()
+        </figure>
+    }
+    else
+    {
+        <div style="text-align: center; padding: 10px 0;">
+            <strong>Please provide an image</strong>
+        </div>
+    }
+}
+
+@helper RenderFigcaption()
+{
+    if (Model.Image.Description.IsEmpty())
+    {
+        return;
+    }
+    @Html.Raw(LeBlender.Helper.IsFrontEnd() ? "<figcaption property=\"description\">" : "<figcaption>")
+    @Model.Image.Description
+    @Html.Raw("</figcaption>")
+}

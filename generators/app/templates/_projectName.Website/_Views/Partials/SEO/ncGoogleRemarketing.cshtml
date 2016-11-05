@@ -1,0 +1,40 @@
+@using NovicellCorporate.FrontendCore.Extensions
+@using SEOChecker.MVC
+@using Umbraco.Core.Models
+@Html.ViewName()
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+@{
+    //Site Node
+    var siteNode = Model.Content.GetSiteNode();
+
+    string googleAnalytics = siteNode.GetPropertyValue<string>("googleAnalytics");
+    bool hasUniversalAnalytics = googleAnalytics == "Universal Analytics";
+    bool enableRemarketing = siteNode.GetPropertyValue<bool>("enableRemarketing");
+
+    if (hasUniversalAnalytics && enableRemarketing)
+    {
+        string gaRemarketingConversionID = Model.Content.GetPropertyValue<string>("gaRemarketingConversionID");
+        string gaRemarketingConversionLabel = Model.Content.GetPropertyValue<string>("gaRemarketingConversionLabel");
+        if (!string.IsNullOrWhiteSpace(gaRemarketingConversionID) && !string.IsNullOrWhiteSpace(gaRemarketingConversionLabel))
+        {
+            <!-- Google Code for Remarketing-->
+            <script type="text/javascript">
+                /* <![CDATA[ */
+                var google_conversion_id = "@gaRemarketingConversionID";
+                var google_conversion_language = "en";
+                var google_conversion_format = "3";
+                var google_conversion_color = "ffffff";
+                var google_conversion_label = "@gaRemarketingConversionLabel";
+                var google_conversion_value = 0;
+                /* ]]> */
+            </script>
+            <script type="text/javascript" src="http://www.googleadservices.com/pagead/conversion.js">
+            </script>
+            <noscript>
+                <div style="display:inline;">
+                    <img height="1" width="1" style="border-style:none;" alt="" src="http://www.googleadservices.com/pagead/conversion/@gaRemarketingConversionID/?value=0&amp;label=@gaRemarketingConversionLabel&amp;guid=ON&amp;script=0" />
+                </div>
+            </noscript>
+        }
+    }
+}
