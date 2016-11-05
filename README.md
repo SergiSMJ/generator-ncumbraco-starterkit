@@ -10,8 +10,11 @@ npm install -g yo
 npm install -g generator-ncumbraco-starterkit
 ```
 
-Then generate your new project:
+## Get started
 
+- Go to your projects folder
+- Create a folder with your project name
+- Inside the folder execute this command for generate your new project:
 ```bash
 yo ncumbraco-starterkit
 ```
