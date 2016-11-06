@@ -4,14 +4,13 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 
 module.exports = yeoman.generators.Base.extend({
-  prompting: function() {
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the splendid ' + chalk.red('generator-ncumbraco-starterkit')
-    ));
     //Configurations will be loaded here.
-    //Ask for user input
     prompting: function() {
+        // Have Yeoman greet the user.
+        this.log(yosay(
+          'Welcome to the splendid ' + chalk.red('generator-ncumbraco-starterkit')
+        ));
+        //Ask for user input
         var done = this.async();
         this.prompt({
           type: 'input',
@@ -136,8 +135,7 @@ module.exports = yeoman.generators.Base.extend({
 
         }
       },
-    },
-    install: function() {
-      this.installDependencies();
-    }
+      install: function() {
+        this.installDependencies();
+      }
 });
